@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <context:annotation-config/>
+    <!--    Dùng để scan và active (tìm và kích hoạt) các annotation bên trong các bean đã được đăng ký trong application context-->
+    <!--trỏ tới packages Spring  -->
+    <context:component-scan base-package="vn.hust.caots.controller"/>
+    <context:component-scan base-package="vn.hust.caots.service"/>
+    <context:component-scan base-package="vn.hust.caots.dao"/>
+
+
+    <!--        trỏ tới folder chứa tất cả các view để tìm-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    <!--  <mvc:resources mapping="/resources/**" location="/WEB-INF/resources/"/>
+    -->
+
+    <!--    Tìm Các class nào có @Controller-->
+    <mvc:annotation-driven/>
+    <!--
+        Hỗ trợ cho các định dạng số với @NumberFormat
+        Hỗ trợ cho các định dạng ngày, lịch, và thời gian  @DateTimeFormat.
+        Hỗ trợ cho việc chứng thực đầu vào @Controller với @Valid.
+        Hỗ trợ đọc và viết XML trên classpath.
+        Hỗ trợ đọc và viết JSON trên classpath.    -->
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+          destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url"
+                  value="jdbc:mysql://localhost:3306/dbminishope"/>
+        <property name="username" value="root"/>
+        <property name="password" value="Chandattoong99"/>
+    </bean>
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="packagesToScan" value="vn.hust.caots.entities"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+    <!-- Transaction config -->
+
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>
