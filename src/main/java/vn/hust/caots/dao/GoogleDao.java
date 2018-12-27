@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Repository
+
 public class GoogleDao implements I_Google, Serializable {
 
     private static final long serialVersionUID = 1L;

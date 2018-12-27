@@ -12,6 +12,7 @@ import vn.hust.caots.entities.Role;
 import vn.hust.caots.entities.User;
 
 import javax.persistence.Query;
+import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,11 +20,12 @@ import java.util.logging.Logger;
 /**
  * @author caots
  */
+
 @Repository // có thể gọi trực tiếp autowired
 @Transactional
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 //trang thái Proxy của class đại diện cho class luôn
-public class UserDao implements I_User {
+public class UserDao implements I_User, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -51,7 +53,7 @@ public class UserDao implements I_User {
     }
 
     @Override
-    public void saveUser( User user) {
+    public void saveUser(User user) {
         try {
             Session session = sessionFactory.getCurrentSession();
             user.setRole(getRoleID());
@@ -77,10 +79,10 @@ public class UserDao implements I_User {
     public int getUserID() {
         try {
             Session session = sessionFactory.getCurrentSession();
-            String hql="select max(id) from User ";
-            Query query=session.createQuery(hql);
-            int maxId= (int) query.getResultList().get(0) + 1;
-            return  maxId ;
+            String hql = "select max(id) from User ";
+            Query query = session.createQuery(hql);
+            int maxId = (int) query.getResultList().get(0) + 1;
+            return maxId;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "get-role-id exeption: {0}", ex.getMessage());
         }
@@ -166,8 +168,20 @@ public class UserDao implements I_User {
             LOG.log(Level.SEVERE, "search-user exeption: {0}", ex.getMessage());
         }
         return null;
-
     }
 
+    public User getUserSecurity(String email) {
+        try {
+            Session session = sessionFactory.getCurrentSession();
+            String hql = "from User where email = :email";
+            Query query = session.createQuery(hql);
+            query.setParameter("email", email);
+            User user = (User) query.getSingleResult();
+            return user;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "get user security; {0}", ex.getMessage());
+        }
+        return null;
+    }
 
 }

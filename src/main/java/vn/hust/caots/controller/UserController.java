@@ -1,9 +1,5 @@
 package vn.hust.caots.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,9 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import vn.hust.caots.entities.User;
 import vn.hust.caots.service.UserService;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author caots
  */
+
 @RestController
 @RequestMapping("users")
 public class UserController {
@@ -94,9 +95,9 @@ public class UserController {
 
 
     @GetMapping(value = "/login",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> checkLogin(@RequestParam String email,
-                                             @RequestParam String passqord) {
-        boolean check = userService.checkLogin(email, passqord);
+    public ResponseEntity<String> checkLogin(@RequestParam("email") String email,
+                                             @RequestParam("password") String password) {
+        boolean check = userService.checkLogin(email, password);
         if (check) {
             return new ResponseEntity<>("Login success !", HttpStatus.OK);
         }

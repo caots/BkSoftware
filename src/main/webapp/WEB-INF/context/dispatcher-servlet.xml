@@ -8,13 +8,14 @@
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--có  <context:component-scan/> thì k cần annotaion-config-->
     <context:annotation-config/>
     <!--    Dùng để scan và active (tìm và kích hoạt) các annotation bên trong các bean đã được đăng ký trong application context-->
     <!--trỏ tới packages Spring  -->
     <context:component-scan base-package="vn.hust.caots.controller"/>
-    <context:component-scan base-package="vn.hust.caots.service"/>
-    <context:component-scan base-package="vn.hust.caots.dao"/>
-
+    <!-- Activates scanning of @Repository and @Service (@Autowired) Dependency Ịnjection-->
+    <context:component-scan base-package="vn.hust.caots"/>
 
     <!--        trỏ tới folder chứa tất cả các view để tìm-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -24,7 +25,7 @@
     <!--  <mvc:resources mapping="/resources/**" location="/WEB-INF/resources/"/>
     -->
 
-    <!--    Tìm Các class nào có @Controller-->
+    <!--Tìm Các class nào có @Controller-->
     <mvc:annotation-driven/>
     <!--
         Hỗ trợ cho các định dạng số với @NumberFormat
@@ -41,6 +42,7 @@
         <property name="username" value="root"/>
         <property name="password" value="Chandattoong99"/>
     </bean>
+
     <bean id="sessionFactory"
           class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"></property>
@@ -58,5 +60,34 @@
           class="org.springframework.orm.hibernate5.HibernateTransactionManager">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
+
     <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--Upload File you need to create a bean for CommonsMultipartResolver.-->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!--tomcat đã cấu hình maxsize = 50 MB-->
+    </bean>
+
+    <!--https://codersontrang.com/2013/04/09/i18n-trong-spring-mvc/-->
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:messages"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+    <bean id="LocaleChangeInterceptor"
+          class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+        <property name="paramName" value="lang"/>
+    </bean>
+    <!--lang là biến mà interceptor dùng để biết ngôn ngữ hiện tại đang là gì-->
+    <bean id="localeResolver"
+          class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+        <property name="defaultLocale" value="en"/>
+    </bean>
+    <!--Trong Spring, khi một request được gửi đến controller, trước khi request được xử lý bởi Controller, nó phải vượt qua các Interceptor-->
+    <mvc:interceptors>
+        <bean parent="LocaleChangeInterceptor"/>
+    </mvc:interceptors>
+
+
 </beans>

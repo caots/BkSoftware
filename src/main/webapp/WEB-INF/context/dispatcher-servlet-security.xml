@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+    <http auto-config="true">
+        <intercept-url pattern="/admin**" access="hasRole('ROLE_ADMIN')"/>
+        <intercept-url pattern="/user-security**" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')"/>
+        <intercept-url pattern="/login**" access="permitAll"/>
+        <!--<intercept-url pattern="/**" access="isAuthenticated()" />: phải được chứng thực(login)-->
+        <access-denied-handler error-page="/login?message=access-denied"/><!--sai quyền truy cập-->
+        <!--authentication-failure-url="/login?message=error"-->
+        <form-login
+                login-page="/login"
+                default-target-url="/user-security"
+                login-processing-url="/j_spring_security_login"
+                authentication-failure-handler-ref="customAuthenticationFailureHandler"
+                username-parameter="email"
+                password-parameter="password"/>
+
+        <logout logout-url="/j_spring_security_logout"
+                logout-success-url="/logout" delete-cookies="JSESSIONID"/>
+
+        <!--token-validity-seconds dùng để xác định thời gian hết hạn cho cookie remember me. (mặc định là 2 tuần)-->
+        <!--authentication-failure-handler-ref="customAuthenticationFailureHandler"-->
+        <!--concurrency-control : kiểm soát sự đồng thời
+         -->
+        <session-management invalid-session-url="/login?message=session-time-out" session-fixation-protection="newSession">
+            <concurrency-control
+                    max-sessions="1"
+                    error-if-maximum-exceeded="false"
+                    expired-url="/login?message=max-session"/>
+        </session-management>
+
+    </http>
+
+    <authentication-manager>
+        <authentication-provider user-service-ref="MyUserDetailsService">
+            <password-encoder ref="bcryptEncoder"/>
+        </authentication-provider>
+    </authentication-manager>
+    <!--{noop} : Không để Spring Security mã hóa mật khẩu-->
+    <beans:bean id="customAuthenticationFailureHandler"
+                class="vn.hust.caots.controller.customAuthenticationFailureHandler"/>
+    <beans:bean id="bcryptEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+    <beans:bean id="MyUserDetailsService" class="vn.hust.caots.service.MyUserDetailsService"/>
+
+
+</beans:beans>
+
+
+        <!--
+        -always-use-default-target :Nếu bằng true thì sẽ luôn chuyển hướng người dùng tới URL được định nghĩa ở thuộc tính default-target-url, bất kể hành động trước đó của người dùng muốn truy cập vào URL nào. Giá trị mặc định làfalse.
+        -authentication-failure-url :Định nghĩ URL sẽ được chuyển hướng tới nếu login thất bại, Mặc định là /login?error
+        -authentication-failure-handler-ref: Có thể sử dụng thay thế thuộc tính  authentication-failure-url, nó cho phép bạn điều khiển luồng sau khi xác thực thất bại.
+        -default-target-url :Định nghĩa URL mặc định được chuyển hướng tới sau khi login thành công.
+        -authentication-success-handler-ref: Có thể sử dụng để thay thế thuộc tính default-target-url và always-use-default-target, Cho phép điều khiển luồng, bổ sung hành động sau khi xác thực thành công.
+        -login-page :URL được sử dụng để render trang login, mặc định là “/login”.
+        -login-processing-url: URL mà Spring Security xử lý hành động login. mặc định là “/login”. Trong ví dụ này mình để là “/j_spring_security_login” thì action trong form login cũng sẽ có giá trị là “/j_spring_security_login“
+        -password-parameter :Tên của request parameter chứa password, mặc định là “password”.
+        -username-parameter :Tên của request parameter chứa username, mặc định là “username”
+        -->

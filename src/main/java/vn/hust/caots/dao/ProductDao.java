@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 @Repository // có thể gọi trực tiếp autowired
 @Transactional(rollbackFor = Exception.class)
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)

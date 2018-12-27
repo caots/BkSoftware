@@ -28,7 +28,7 @@ public class User implements Serializable {
     private String password;
     private String facebookid;
     private String facebooklink;
-    @ManyToOne (cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id")
     private Role role_id;
     private int status = 1;
@@ -156,4 +156,5 @@ public class User implements Serializable {
     public void setStatus(int Status) {
         this.status = Status;
     }
+
 }
